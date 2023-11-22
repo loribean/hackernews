@@ -13,7 +13,13 @@ import (
 
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	panic(fmt.Errorf("not implemented: CreateLink - createLink"))
+	var link model.Link
+	var user model.User
+	link.Title = input.Title
+	link.Address = input.Address
+	user.Name = "admin"
+	link.User = &user
+	return &link, nil
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -33,7 +39,16 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	panic(fmt.Errorf("not implemented: Links - links"))
+	var links []*model.Link
+	dummyLink := model.Link{
+		Title:   "Our dummy link",
+		Address: "https://address.org",
+		User: &model.User{
+			Name: "admin",
+		},
+	}
+	links = append(links, &dummyLink)
+	return links, nil
 }
 
 // Mutation returns MutationResolver implementation.
