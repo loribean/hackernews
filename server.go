@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/loribean/hackernews/graph"
+	"github.com/loribean/hackernews/internal/auth"
 )
 
 const defaultPort = "8080"
@@ -22,6 +23,7 @@ func main() {
 	}
 
 	router := chi.NewRouter()
+	router.Use(auth.Middleware())
 
 	database.InitDB()
 	defer database.CloseDB()
