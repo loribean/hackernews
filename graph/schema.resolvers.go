@@ -8,18 +8,19 @@ import (
 	"context"
 	"fmt"
 
+	"strconv"
+
 	"github.com/loribean/hackernews/graph/model"
+	"github.com/loribean/hackernews/internal/links"
 )
 
 // CreateLink is the resolver for the createLink field.
 func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) (*model.Link, error) {
-	var link model.Link
-	var user model.User
+	var link links.Link
 	link.Title = input.Title
 	link.Address = input.Address
-	user.Name = "admin"
-	link.User = &user
-	return &link, nil
+	linkID := link.Save()
+	return &model.Link{ID: strconv.FormatInt(linkID, 10), Title: link.Title, Address: link.Address}, nil
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -39,16 +40,12 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 
 // Links is the resolver for the links field.
 func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
-	var links []*model.Link
-	dummyLink := model.Link{
-		Title:   "Our dummy link",
-		Address: "https://address.org",
-		User: &model.User{
-			Name: "admin",
-		},
+	var result []*model.Link
+	dbLinks := links.GetAll()
+	for _, link := range dbLinks {
+		result = append(result, &model.Link{ID: link.ID, Title: link.Title, Address: link.Address})
 	}
-	links = append(links, &dummyLink)
-	return links, nil
+	return result, nil
 }
 
 // Mutation returns MutationResolver implementation.

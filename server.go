@@ -4,19 +4,18 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"github.com/go-chi/chi"
-	"github.com/loribean/hackernews/database"
+
+	database "github.com/loribean/hackernews/internal/pkg/db/mysql"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/golang-migrate/migrate"
+	"github.com/go-chi/chi"
 	"github.com/loribean/hackernews/graph"
 )
 
 const defaultPort = "8080"
 
-
 func main() {
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
@@ -27,7 +26,7 @@ func main() {
 	database.InitDB()
 	defer database.CloseDB()
 	database.Migrate()
-	server := handler.NewDefaultServer(hackernews.NewExecutableSchema(hackernews.Config{Resolvers: &hackernews.Resolver{}}))
+	server := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", server)
 
