@@ -29,6 +29,6 @@ type RefreshTokenInput struct {
 }
 
 type User struct {
-	ID   *string `json:"id,omitempty"`
-	Name string  `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
