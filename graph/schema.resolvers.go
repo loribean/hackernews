@@ -7,11 +7,12 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"strconv"
 
 	"github.com/loribean/hackernews/graph/model"
 	"github.com/loribean/hackernews/internal/links"
+	"github.com/loribean/hackernews/internal/users"
+	"github.com/loribean/hackernews/pkg/jwt"
 )
 
 // CreateLink is the resolver for the createLink field.
@@ -24,8 +25,16 @@ func (r *mutationResolver) CreateLink(ctx context.Context, input model.NewLink) 
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
+	var user users.User
+	user.Username = input.Username
+	user.Password = input.Password
+	user.Create()
+	token, err := jwt.GenerateToken(user.Username)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 // Login is the resolver for the login field.
